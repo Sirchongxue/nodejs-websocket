@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="js/jquery.mobile-1.4.5.min.css">
+<script src="js/jquery-1.11.3.min.js"></script>
+<script src="js/jquery.mobile-1.4.5.min.js"></script>
+    <title>Title</title>
+    <style>
+        form{
+            margin: 30px auto;
+            width: 35%;
+        }
+    </style>
+ 
+
+
+</head>
+<body>
+<br>
+<form class="form">
+    <fieldset>
+        <legend>websocket 控制</legend>
+        <br>
+        <br>
+        <div>  
+    <button type="button" style="background: #EEF9F3" id="deng1" value="100">灯1</button>
+    <button type="button" style="background: #EEF9F3" id="deng2" value="110">灯2</button> 
+        </div>
+        <br>
+         
+        <span id='content'>客户端未连接</span></br>
+        <span id='states1'>deng1 close:100</span></br>
+        <span id='states2'>deng2 close:110</span></br>
+        <input type="button" value="连接" id="connect" class="connect"/>
+    </fieldset>
+</form>
+<script>
+    var oUl=document.getElementById('content');
+    var oConnect=document.getElementById('connect');
+    var oSend=document.getElementById('send');
+    var oInput=document.getElementById('message');
+    var ws=null;
+    oConnect.onclick=function(){
+        ws = new WebSocket('ws://localhost:3000/ws'); 
+        ws.onopen=function(){
+             
+            document.getElementById('content').innerHTML = "客户端已连接";
+        }
+        ws.onmessage=function(evt){ 
+            
+            //document.getElementById('states').innerHTML = "deng : "+evt.data
+            var arr = evt.data.split('');
+            if(arr[1]==0){//deng1
+                var deng = "deng1";
+                changeState(deng,'states1');
+            }else if(arr[1]==1){//deng2
+                var deng = "deng2";
+                changeState(deng,'states2');
+            } 
+            function changeState(deng,state){
+
+                $('#'+deng).val(evt.data);
+                if(arr[2]==1){//open 
+                    document.getElementById(state).innerHTML = deng+" open:"+evt.data;
+                    $('#'+deng).css("background-color","#B3B4A6");
+                }else if(arr[2]==0){
+                    document.getElementById(state).innerHTML = deng+" close:"+evt.data;
+                    $('#'+deng).css("background-color","#EEF9F3");
+                }
+            }   
+
+
+            /*oUl.innerHTML ="<li>"+(typeof evt.data)+"</li>";*/
+            //getresult(evt.data);
+        }
+        ws.onclose=function(){
+             
+            document.getElementById('content').innerHTML = "客户端已断开连接";
+        };
+        ws.onerror=function(evt){
+            oUl.innerHTML+="<li>"+evt.data+"</li>";
+
+        };
+    };
+
+    function getresult(data){
+        if(data == '1'){
+            document.getElementById('states').innerHTML = "灯1打开，灯2打开"
+        }else if(data == '2'){
+            document.getElementById('states').innerHTML = "灯1关闭，灯2关闭"
+        }else if(data == '3'){
+            document.getElementById('states').innerHTML = "灯1打开，灯2打开"
+        }else if(data == '4'){
+            document.getElementById('states').innerHTML = "灯1关闭，灯2打开"
+        } 
+
+
+    }
+     
+
+//$(document).on("pagecreate","#pageone",function(){
+      $("#deng1").on("tap",function(){  
+        ws.send($("#deng1").val());
+      });                       
+//});
+      $("#deng2").on("tap",function(){ 
+        ws.send($("#deng2").val());
+      });  
+
+    /*function clickDend(val){
+        console.log(val)
+        if(ws){
+            ws.send(val);
+        }
+    }*/
+
+</script>
+</body>
+</html>

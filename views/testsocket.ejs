@@ -1,0 +1,56 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+  <title> shenmogui </title>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/js/jquery.mobile-1.4.5.min.css">
+  <script src="/js/jquery-1.11.3.min.js"></script>
+  <script src="/js/jquery.mobile-1.4.5.min.js"></script>
+</head>  
+<body>  
+
+ <button type="button" style="background: #EEF9F3" id="deng1" value="100">灯1</button>
+
+<span id='content'>客户端未连接</span></br>
+
+<input type="button" value="连接" id="connect" class="connect"/>
+<span id='message'>message</span></br>
+
+
+
+    <script>  
+    var oUl=document.getElementById('content');
+    var oConnect=document.getElementById('connect'); 
+    var omessage=document.getElementById('message'); 
+    var ws = null;
+    oConnect.onclick=function(){
+           
+          ws = new WebSocket('ws://localhost:3000/ws');  
+          ws.onmessage=function(e){  
+            document.getElementById('content').innerHTML = e.data; 
+             
+          };  
+          ws.onerror=function(err){  
+            console.log('_error');  
+            console.log(err);  
+          };  
+          ws.onopen=function(){  
+            console.log('_connect');
+            document.getElementById('content').innerHTML = "客户端已连接";
+          };  
+          ws.onclose=function(){  
+            document.getElementById('content').innerHTML = "客户端已断开连接";
+          };  
+      
+          ws.send('data'); 
+    }
+
+    $("#deng1").on("tap",function(){ 
+        ws.send($("#deng1").val());
+    });    
+      
+    </script>  
+    </body>  
+    </html>  
